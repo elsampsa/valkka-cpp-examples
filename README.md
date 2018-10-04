@@ -8,10 +8,12 @@ With Valkka, media streams (either encoded or decoded) can be copied, forked and
 
 Filters and multithreads are written at the cpp level.  The cpp code is interfaced to python, while the connection topology is programmed at the python level.
 
-Here we provide a scaffold to create your own valkka cpp extensions that is interfaced automatically to python, under the "valkka.*" namespace.
+Here we provide a scaffold to create your own valkka cpp extensions that is interfaced automatically to python, under the **valkka.*** namespace.
 
 As an example, we create the module "valkka.gizmo".  Proceed like this:
 
+    git clone git@github.com:elsampsa/valkka-cpp-examples.git
+    cd valkka-cpp-examples
     cp -r example_module gizmo
     cd gizmo
     ./reinit.bash
@@ -61,11 +63,11 @@ In that directory, edit the "run_cmake.bash" script.  When you're ready, compile
     ./run_cmake.bash
     make
     
-To use your development build, set
+To use your development build, set 
 
     source test_env.bash
     
-Keep the $LD_LIBRARY_PATH and $PYTHONPATH consistent (they should include both libraries library and python paths)
+Keep the $LD_LIBRARY_PATH and $PYTHONPATH consistent (they should include correct libraries and python paths)
 
     
 ## Using Valkka API from Cpp
