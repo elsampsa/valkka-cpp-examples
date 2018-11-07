@@ -103,6 +103,8 @@ file(GLOB SOURCES src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 # => now the target_* commands work
 
+# target_link_libraries(${PROJECT_NAME} "-Wl,--no-as-needed") # NOTE: add this one if libValkka dependency is not for some reason included into your shared library
+
 option(valkka_lib "valkka_lib" OFF)
 if    (valkka_lib)
   target_link_libraries(${PROJECT_NAME} "-L${valkka_lib}")

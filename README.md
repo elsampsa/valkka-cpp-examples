@@ -4,6 +4,8 @@ Valkka is an OpenSource video programming library for Linux with a native Python
 
 ## Building extension modules
 
+For info about Valkka extension modules, see [here](https://elsampsa.github.io/valkka-examples/_build/html/modules.html)
+
 With Valkka, media streams (either encoded or decoded) can be copied, forked and diverted through filters and into various kinds of multithreads (live555 streaming thread, decoder threads, file writing threads, etc.).
 
 Filters and multithreads are written at the cpp level.  The cpp code is interfaced to python, while the connection topology is programmed at the python level.

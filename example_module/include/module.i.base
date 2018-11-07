@@ -11,6 +11,7 @@
 #include "thread.h"
 
 #include "example_filter.h"
+#include "example_thread.h"
 
 #include <Python.h>
 

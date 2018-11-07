@@ -27,9 +27,7 @@
  *  @brief   An example FrameFilter, implemented in its own cpp module and interfaced to python
  */ 
 
-#include "frame.h"
-#include "framefilter.h"
-#include "framefifo.h"
+#include "example_common.h"
 
 /** A "hello world" FrameFilter demo class: prints its own name if verbose is set to true.
  */
