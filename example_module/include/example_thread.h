@@ -25,28 +25,33 @@
  *  @version 0.1
  *  
  *  @brief   An example thread receiving frames - and doing something with them
- */ 
+ */
 
 #include "example_common.h"
 
 /** Signals used by ExampleThread
  */
-enum class ExampleSignal {
-  none,
-  exit
+enum class ExampleSignal
+{
+    none,
+    exit
 };
 
-  
+namespace SignalType
+{
+    const static unsigned example_signal = 100;
+}
+
 /** Redefinition of characteristic signal contexts (info that goes with the signal)
 */
-struct ExampleSignalContext {
-  ExampleSignal signal;
+struct ExampleSignalContext
+{
+    ExampleSignal signal;
 };
-
 
 /** An example thread receiving frames
  * 
- * - Request a frame filter using the getFrameFilter method
+ * - Request a frame filter from this Thread, using the getFrameFilter method
  * - Start writing frames into that FrameFilter
  * - This thread queues those frames and then uses them for something .. say, for image analysis
  * - There are two ways to communicate with the thread ..
@@ -57,38 +62,37 @@ struct ExampleSignalContext {
  * - WARNING: untested!
  * 
  */
-class ExampleThread : public Thread {         // <pyapi>
+class ExampleThread : public Thread { // <pyapi>
 
-public:                                       // <pyapi>
-    ExampleThread(const char *name, FrameFifoContext fifo_ctx=FrameFifoContext());  // <pyapi>
-    ~ExampleThread();                                                               // <pyapi>
+public:                                                                              // <pyapi>
+    ExampleThread(const char *name, FrameFifoContext fifo_ctx = FrameFifoContext()); // <pyapi>
+    ~ExampleThread();                                                                // <pyapi>
 
-protected: // frame input
-    FrameFifo               infifo;           ///< Incoming frames are read from here
-    FifoFrameFilter         infilter;         ///< Write incoming frames here
-    BlockingFifoFrameFilter infilter_block;   ///< Incoming frames can also be written here.  If stack runs out of frames, writing will block
+protected:                                  // frame input
+    FrameFifo infifo;                       ///< Incoming frames are read from here
+    FifoFrameFilter infilter;               ///< Write incoming frames here
+    BlockingFifoFrameFilter infilter_block; ///< Incoming frames can also be written here.  If stack runs out of frames, writing will block
 
-    const static int        timeout = 1000;   ///< Thread timeout in milliseconds
-    
-protected: // Thread member redefinitions
-    std::deque<ExampleSignalContext> signal_fifo;   ///< Redefinition of signal fifo.
-  
+    const static int timeout = 1000; ///< Thread timeout in milliseconds
+
+protected:                                        // Thread member redefinitions
+    std::deque<ExampleSignalContext> signal_fifo; ///< Redefinition of signal fifo.
+
 public: // redefined virtual functions
     void run();
     void preRun();
     void postRun();
-    void sendSignal(ExampleSignalContext signal_ctx);    ///< Insert a signal into the signal_fifo
-      
+    void sendSignal(ExampleSignalContext signal_ctx); ///< Insert a signal into the signal_fifo
+
 protected:
     void handleSignal(ExampleSignalContext &signal_ctx); ///< Handle an individual signal.  Signal can originate from the frame fifo or from the signal_fifo deque
     void handleSignals();                                ///< Call ExampleThread::handleSignal for every signal in the signal_fifo
-  
-// public API section
-public:                                         // <pyapi>
-  FifoFrameFilter &getFrameFilter();            // <pyapi>
-  FifoFrameFilter &getBlockingFrameFilter();    // <pyapi>
-  void requestStopCall();                       // <pyapi>
-};                                              // <pyapi>
 
+    // public API section
+public:                                        // <pyapi>
+    FifoFrameFilter &getFrameFilter();         // <pyapi>
+    FifoFrameFilter &getBlockingFrameFilter(); // <pyapi>
+    void requestStopCall();                    // <pyapi>
+};                                             // <pyapi>
 
 #endif

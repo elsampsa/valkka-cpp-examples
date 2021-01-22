@@ -198,10 +198,12 @@ foreach( testname ${TESTNAMES} )
   target_include_directories(${testname} PUBLIC "${LIVE555_ROOT}/liveMedia/include" "${LIVE555_ROOT}/groupsock/include" "${LIVE555_ROOT}/BasicUsageEnvironment/include" "${LIVE555_ROOT}/UsageEnvironment/include")
   target_include_directories(${testname} PUBLIC "${FFMPEG_ROOT}")
   target_include_directories(${testname} PUBLIC "${VALKKA_INCLUDE_DIRS}")
+  target_include_directories(${testname} PUBLIC "${PYTHON_INCLUDE_DIRS}")
 
   target_link_libraries(${testname} "Valkka.so")
   target_link_libraries(${testname} "${PROJECT_NAME}.so")
   target_link_libraries(${testname} "-L${CMAKE_CURRENT_BINARY_DIR}/lib")
+  target_link_libraries(${testname} ${PYTHON_LIBRARIES})
 
   if    (valkka_lib)
     target_link_libraries(${testname} "-L${valkka_lib}")

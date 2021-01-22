@@ -44,5 +44,11 @@ protected:
   
 };                                                                               // <pyapi>
 
+
+/** Test that numpy array interface works properly..
+ * 
+ */
+PyObject* testnumpy(PyObject* array);                                            // <pyapi>
+
 #endif
 

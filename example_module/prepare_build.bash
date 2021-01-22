@@ -1,9 +1,8 @@
 #!/bin/bash
 #
-# Downloads exteral libraries (live555 and fffmpeg) and prepares them
+# Downloads exteral libraries and prepares them
 #
 cd ext
-./download_live.bash
-./download_ffmpeg.bash
+# run something
 cd ..
 make -f debian/rules clean

@@ -31,6 +31,4 @@
 #include "framefifo.h"
 #include "thread.h"
 
-
-
 #endif

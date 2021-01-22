@@ -38,6 +38,8 @@ Next, confirm that the python interface works:
 
     cd python
     python3 quicktest
+    cd test
+    python3 test_1.py
 
 If no errors were present, then congrats, you have a new valkka extension, usable in python from "valkka.gizmo".
 
@@ -70,10 +72,5 @@ To use your development build, set
     source test_env.bash
     
 Keep the $LD_LIBRARY_PATH and $PYTHONPATH consistent (they should include correct libraries and python paths)
-
-    
-## Using Valkka API from Cpp
-
-libValkka is used mainly from python.  *examples(s) coming soon*
 
 

@@ -13,11 +13,11 @@ mv example_module $name
 cd $pwd
 # replace project names
 
-fs="README.md CMakeLists.txt python/quicktest.py python/valkka/*/__init__.py python/valkka/README.md include/module.i.base"
+fs="CMakeLists.txt python/quicktest.py python/test/*.py python/valkka/*/__init__.py python/valkka/README.md include/module.i.base"
 for f in $fs
 do
   find $f -exec sed -i "s/example_module/$name/g" {} \;
 done
 # decouple from git
-rm -rf .git .gitignore
+# rm -rf .git .gitignore
 
