@@ -27,8 +27,23 @@
  *  @brief
  */ 
 
+// libValkka headers
 #include "framefilter.h"
 #include "framefifo.h"
 #include "thread.h"
+#include "decoderthread.h"
+#include "decoder.h"
+
+// system headers
+#include <assert.h>
+#include <stdint.h>
+#include <mutex>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <string.h>
+#include <iostream>
+#include <algorithm>
+#include <chrono>
 
 #endif

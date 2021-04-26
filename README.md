@@ -1,6 +1,6 @@
 # Valkka Cpp Examples
 
-Valkka is an OpenSource video programming library for Linux with a native Python3 interface.  For more details, see [here](https://elsampsa.github.io/valkka-examples/)
+Valkka is an OpenSource media streaming library for Linux with a native Python3 interface.  For more details, see [here](https://elsampsa.github.io/valkka-examples/)
 
 ## Building extension modules
 
@@ -21,8 +21,39 @@ As an example, we create the module "valkka.gizmo".  Proceed like this:
     ./reinit.bash
 
 After that, there are two ways of compiling your custom extension
-    
-**Valkka installed from a debian package**
+
+## FrameFilter and a Thread Example
+
+Please find then in the example code
+
+## Custom HW / GPU Decoder Example/sketch
+
+This is included in a very sketchy way into the examples source code
+
+libValkka employes a decoder thread (base class DecoderThread) which uses a decoder (base class Decoder) like this:
+
+- 1. DecoderThread populates member Decoder::in_frame
+- 2. DecoderThread calls method Decoder::pull
+      - Decoder::pull uses Decoder::in_frame's bytebuffer and decodes the frame
+      - Decoder::pull inspects the 3.rd party decoding API to see if there's a decoded frame
+      - ..If there is an available frame, returns true, otherwise false
+- 3. DecoderThread calls immediately Decoder::output
+- 4. Decoder::output returns a pointer to the member out_frame (AVBitmapFrame)
+
+This case applies to, for example, the ffmpeg library.
+
+Hardware vendors, however, typically offer you an asynchronous API, so you the situation looks like this:
+
+- 1. DecoderThread populates member Decoder::in_frame
+- 2. DecoderThread calls method Decoder::pull
+      - Decoder::pull uses Decoder::in_frame bytebuffer and sends the data for decoding
+      - Frame is decoded asynchronously by the API, see MyDecoder::callback in the example code
+      - Decoder::callback places the result into ringbuffer Decoder::out_frame_rb
+      - Decoder::pull inspects the ringbuffer.  If there is an available frame, returns true, otherwise false
+ - 3. DecoderThread calls immediately Decoder::output
+ - 4. Decoder::output returns the correct out_frame (AVBitmapFrame) from the ringbuffer
+
+### Valkka installed from a debian package**
 
 If you have installed valkka with "apt-get install" or "dpkg -i", continue building your extension module with
 
@@ -38,8 +69,6 @@ Next, confirm that the python interface works:
 
     cd python
     python3 quicktest
-    cd test
-    python3 test_1.py
 
 If no errors were present, then congrats, you have a new valkka extension, usable in python from "valkka.gizmo".
 
@@ -55,7 +84,7 @@ Now, from any terminal try:
     ipython3
     from valkka.gizmo import *
     
-**Valkka compiled from source**
+### Valkka compiled from source
 
 If you compiled libValkka from the source code by yourself, we need a more fine-grained control over the build process.  Proceed like this:
 
@@ -72,5 +101,4 @@ To use your development build, set
     source test_env.bash
     
 Keep the $LD_LIBRARY_PATH and $PYTHONPATH consistent (they should include correct libraries and python paths)
-
 

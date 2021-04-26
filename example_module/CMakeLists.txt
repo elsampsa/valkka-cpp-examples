@@ -39,6 +39,22 @@ if    (ffmpeg_root)
   SET(FFMPEG_ROOT ${ffmpeg_root})
 endif (ffmpeg_root)
 
+option(python_command "python_command" OFF)
+IF(python_command)
+    message("custom python3 command defined")
+ELSE()
+    message("using default python3 command")
+    SET(python_command "python3")
+ENDIF(python_command)
+
+## add extra libs
+#SET(YOUR_INCLUDE "${your_root}/include")
+#SET(YOUR_LIB "${your_root}/lib64")
+#message("YOUR_INCLUDE: ${YOUR_INCLUDE}")
+#message("YOUR_LIB: ${YOUR_LIB}")
+#add_definitions("-DENABLE_SOMETHING")
+#SET(YOUR_LIBS "lib1;lib2;etc")
+
 ## ** Where your custom-compiled library is located **
 #SET(DEMO_ROOT "${CMAKE_SOURCE_DIR}/ext/demo")
 #option(demo_root "demo_root" OFF)
@@ -67,7 +83,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # [dependencies]
 # exec_program(pkg-config ARGS --cflags x11 glew OUTPUT_VARIABLE GL_CFLAGS)
 # exec_program(pkg-config ARGS --libs x11 glew OUTPUT_VARIABLE GL_LIBS)
-pkg_search_module(PYTHON REQUIRED python3)
+# pkg_search_module(PYTHON REQUIRED python3)
 # populates *_INCLUDE_DIRS and *_LIBRARIES variables
 
 # pkg_search not used for valkka
@@ -75,7 +91,25 @@ SET(VALKKA_LIBRARIES "-lValkka")
 SET(VALKKA_INCLUDE_DIRS "${VALKKA_ROOT}/include")
 
 message("*** PYTHON INTERFACE ***")
-# execute_process(COMMAND python3 -c "from distutils import sysconfig; print(sysconfig.get_python_lib(),end='')" OUTPUT_VARIABLE PYTHON_DIR)
+# pkg_search_module(PYTHON REQUIRED python3) # don't use! https://bugs.python.org/issue36721
+exec_program("${python_command}-config" ARGS --includes OUTPUT_VARIABLE PYTHON_INCLUDE_DIRS_TMP)
+# exec_program(python3-config ARGS --libs --embed OUTPUT_VARIABLE PYTHON_LIBRARIES_TMP RETURN_VALUE RETVAL)
+exec_program("${python_command}-config" ARGS --ldflags --embed OUTPUT_VARIABLE PYTHON_LIBRARIES RETURN_VALUE RETVAL)
+#message("RETVAL: ${RETVAL}")
+if(RETVAL)
+    message("${python_command}-config failed with --embed, so will re-run without it")
+    # exec_program(python3-config ARGS --libs OUTPUT_VARIABLE PYTHON_LIBRARIES_TMP RETURN_VALUE RETVAL)
+    exec_program("${python_command}-config" ARGS --ldflags OUTPUT_VARIABLE PYTHON_LIBRARIES RETURN_VALUE RETVAL)
+else(RETVAL)
+    # nada
+endif(RETVAL)
+#string(REPLACE " -l" " " PYTHON_LIBRARIES_TMP ${PYTHON_LIBRARIES_TMP})
+#string(REPLACE " " ";" PYTHON_LIBRARIES ${PYTHON_LIBRARIES_TMP})
+string(REPLACE "-I" " " PYTHON_INCLUDE_DIRS_TMP ${PYTHON_INCLUDE_DIRS_TMP})
+string(REPLACE " " ";" PYTHON_INCLUDE_DIRS ${PYTHON_INCLUDE_DIRS_TMP})
+message("PYTHON_LIBRARIES: ${PYTHON_LIBRARIES}")
+message("PYTHON_INCLUDE_DIRS: ${PYTHON_INCLUDE_DIRS}")
+
 set(PYTHON_DIR "lib/python3/dist-packages") # just hard-code it
 message("PYTHON INSTALL DIR           : " ${PYTHON_DIR})
 
@@ -88,7 +122,7 @@ execute_process(
 )
 
 execute_process(
-  COMMAND swig -python -c++ -o ${CMAKE_SOURCE_DIR}/python/valkka/example_module/valkka_example_module_wrap.cpp -outdir ${CMAKE_SOURCE_DIR}/python/valkka/example_module ${CMAKE_SOURCE_DIR}/include/module.i
+  COMMAND swig -python -c++ -o ${CMAKE_SOURCE_DIR}/python/valkka/example_module/core/valkka_example_module_wrap.cpp -outdir ${CMAKE_SOURCE_DIR}/python/valkka/example_module/core ${CMAKE_SOURCE_DIR}/include/module.i
 )
 
 # compiler flags
@@ -122,6 +156,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${VALKKA_INCLUDE_DIRS} ${PYTHO
 
 target_link_libraries(${PROJECT_NAME} ${VALKKA_LIBRARIES} ${PYTHON_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} "pthread")
+
+# your libs
+#target_link_libraries(${PROJECT_NAME} "${YOUR_LIBS}")
+#target_link_libraries(${PROJECT_NAME} "-L${YOUR_LIB}")
+
 
 message("VALKKA  ROOT : ${VALKKA_ROOT}")
 message("LIVE555 ROOT : ${LIVE555_ROOT}")
@@ -170,12 +209,14 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${VALKKA_INCLUDE_DIRS}")
 # **************************************************************************************************
 
 # *** (SWIG, 3) Compile the cpp-wrapped python code ***
-add_library(swig_module SHARED ${CMAKE_SOURCE_DIR}/python/valkka/example_module/valkka_example_module_wrap.cpp)
+add_library(swig_module SHARED ${CMAKE_SOURCE_DIR}/python/valkka/example_module/core/valkka_example_module_wrap.cpp)
 target_include_directories(swig_module PUBLIC include)
 target_include_directories(swig_module PUBLIC ${VALKKA_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
 target_include_directories(swig_module PUBLIC "${LIVE555_ROOT}/liveMedia/include" "${LIVE555_ROOT}/groupsock/include" "${LIVE555_ROOT}/BasicUsageEnvironment/include" "${LIVE555_ROOT}/UsageEnvironment/include")
 target_include_directories(swig_module PUBLIC "${FFMPEG_ROOT}") # ffmpeg header files are referred in the code with the directory name
 target_include_directories(swig_module PUBLIC "${VALKKA_INCLUDE_DIRS}") 
+# your include dir
+#target_include_directories(swig_module PUBLIC "${YOUR_INCLUDE}")
 
 # target_include_directories(swig_module PUBLIC "${NUMPY_INCLUDE_DIR}") # ffmpeg header files are referred in the code with the directory name
 
@@ -186,7 +227,7 @@ set_target_properties(swig_module PROPERTIES VERSION ${VERSION_STRING} SOVERSION
 set_target_properties(swig_module PROPERTIES PREFIX "")
 set_target_properties(swig_module PROPERTIES OUTPUT_NAME "_valkka_example_module")
 set_target_properties(swig_module PROPERTIES SUFFIX ".so")
-set_target_properties(swig_module PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/python/valkka/example_module)
+set_target_properties(swig_module PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/python/valkka/example_module/core)
 
 add_dependencies(swig_module ${PROJECT_NAME}) # swig .so depends on the main shared library
 

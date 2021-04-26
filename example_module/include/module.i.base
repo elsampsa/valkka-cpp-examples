@@ -1,14 +1,17 @@
 %module valkka_example_module
 %include <std_string.i>
 
-// this has the effect of initializing numpy with call to "import_array()"
-%pythoncode %{  from valkka import core %}
+// this has the effect of initializing numpy with call to "import_array()":
+// but let's not do it here - the interfaced cpp code needs the numpy API imported
+// %pythoncode %{  from valkka import core %}
 
 %{ // this is prepended in the wapper-generated c(pp) file
 #define SWIG_FILE_WITH_INIT
 
 #include "example_filter.h"
 #include "example_thread.h"
+#include "mydecoder.h"
+#include "mythread.h"
 
 // https://docs.scipy.org/doc/numpy/reference/c-api.array.html#importing-the-api
 // https://github.com/numpy/numpy/issues/9309#issuecomment-311320497
@@ -19,7 +22,9 @@
 %}
 
 %init %{
-    // WARNING: numpy initialization is done from libValkka
+    // numpy initialization could be done from libValkka (see section "%pythoncode" above)
+    // but the cpp code is loaded before that and it needs to find the valkka_shmem_unique_symbol
+    import_array();
 %}
 
 // Swig should not try to create a default constructor for the following classes as they're abstract (swig interface file should not have the constructors either):

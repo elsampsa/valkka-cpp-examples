@@ -49,6 +49,5 @@ protected:
  * 
  */
 PyObject* testnumpy(PyObject* array);                                            // <pyapi>
-
 #endif
 

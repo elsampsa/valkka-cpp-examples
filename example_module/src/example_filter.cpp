@@ -26,7 +26,7 @@
  */ 
 
 #include "example_filter.h"
-#include "numpy_no_import.h"
+#include "numpy_no_import.h" // include this if you're using the numpy API
 
 // subclass like this:
 MyFrameFilter::MyFrameFilter(const char* name, bool verbose, FrameFilter* next) : FrameFilter(name,next), verbose(verbose) {
@@ -52,7 +52,7 @@ PyObject* testnumpy(PyObject* array) {
     // get data buffer
     uint8_t* buf = (uint8_t*)PyArray_BYTES(pa); // the data byte-buffer
     std::size_t size = (std::size_t)(dims[0]);
-    std::cout << "got numpy array with dimension " << size << std::endl;
+    std::cout << "HELLO FROM cpp: got numpy array with dimension " << size << std::endl;
     // now: buf is a buffer of the data, size is it's size
     // remember to check that buf doesn't overflow
     Py_DECREF(array);

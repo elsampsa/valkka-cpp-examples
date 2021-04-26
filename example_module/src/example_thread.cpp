@@ -26,7 +26,7 @@
  */ 
 
 #include "example_thread.h"
-#include "numpy_no_import.h"
+#include "numpy_no_import.h" // include this if you're using the numpy API
 
 ExampleThread::ExampleThread(const char *name, FrameFifoContext fifo_ctx) : Thread(name), infifo(name,fifo_ctx), infilter(name,&infifo), infilter_block(name,&infifo) {
 }

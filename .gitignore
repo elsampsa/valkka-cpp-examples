@@ -1,6 +1,7 @@
 example_module/include/module.i
-example_module/python/valkka/example_module/*.so*
-example_module/python/valkka/example_module/valkka_example_module.py
-example_module/python/valkka/example_module/valkka_example_module_wrap.cpp
+example_module/python/valkka/example_module/core/*.so*
+example_module/python/valkka/example_module/core/valkka_example_module.py
+example_module/python/valkka/example_module/core/valkka_example_module_wrap.cpp
 example_module/build/
+example_module/build_dir/
 __pycache__
