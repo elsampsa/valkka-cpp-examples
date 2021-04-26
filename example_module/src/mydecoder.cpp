@@ -37,7 +37,7 @@ MyDecoder::MyDecoder(AVCodecID av_codec_id, int n_buf) : Decoder(),
     // your hw decoder probably works with callbacks,
     // so give it "my_decoder_callback" & as a parameter
     // this object, aka. "this"
-
+    //
     // If something goes wrong in the initializations,
     // (1) set the corresponding object into NULL (like in the init list of this ctor)
     // (2) set this->active to false 
@@ -71,11 +71,28 @@ void MyDecoder::callback(void* callbackpars) {
                 return;
             }
             AVBitmapFrame *f = (AVBitmapFrame*)(out_frame_rb[ind]);
-            f->copyMetaFrom(&(in_frame)); // TODO
+            //
+            // you need to access the metadata of the frame somehow
+            // normally, we would do this (in order to copy the n_slot & subsession_index members)
+            //
+            // f->copyMetaFrom(&(in_frame));
+            //
+            // but that's wrong since this is an asynchronous callback, running
+            // in some other thread evoked by the hw API
+            //
+            // if your API has the possibility to give custom
+            // data at each decoding call to the API
+            // (you do this calling in MyDecoder::push)
+            // then take advantage of that
+            //
+            // if that's not the case, since n_slot & subsession_index
+            // are not going to change between frames in most user cases
+            // keep them constant and insert here into members n_slot & subsession_index
+            //
             // next, copy your decoded frame to f->data
-            // remember that it must be in 420P, i.e.
+            // Remember that it must be in 420P, i.e.
             // completely planar 420P.  You might need
-            // to deinterlace from your hw accelerators format to 420P
+            // to deinterlace from your hw accelerator's format to 420P
         } // PROTECTED
 }
 
@@ -150,6 +167,12 @@ bool MyDecoder::pull()
     // to your hw decoder.  Don't forget timestamps!
     // data length:
     std::size_t size_ = in_frame.payload.size();
+    /* A small catch here:
+
+    One can typically feed the hw decoder API the PTS (presentation timestamp),
+    but no more custom data.  However, we'll need n_slot & subsession_index
+    in function MyDecoder::callback (see that function for more details)
+    */
 #ifdef MyDecoder_VERBOSE
     std::cout << "timestamp: " << in_frame.mstimestamp << std::endl;
 #endif
@@ -173,5 +196,4 @@ bool MyDecoder::pull()
         }
     } // PROTECTED
 }
-
 
